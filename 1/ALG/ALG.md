@@ -1,9 +1,9 @@
 # Algoritmica
 
 
-# Dispense
+## Dispense
 
 
-# Materiale Studenti
+## Materiale Studenti
 
 * [Laboratori Svolti](/labs) Eserciti svolti [Auth. Pontone Marco]
