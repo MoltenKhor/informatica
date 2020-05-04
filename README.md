@@ -1,4 +1,4 @@
-# Materia di studio di Informatica [UNIPI]
+# Materiale di studio di Informatica [UNIPI]
 
 
 
