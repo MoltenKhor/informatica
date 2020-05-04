@@ -6,4 +6,4 @@
 
 ## Materiale Studenti
 
-* [Laboratori Svolti](/labs) Eserciti svolti [Auth. Pontone Marco]
+* [Laboratori Svolti](../labs) Eserciti svolti [Auth. Pontone Marco]
