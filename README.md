@@ -8,7 +8,7 @@
 *   [Analisi Matematica](1/AM/AM.md)
 *   [Algebra e Matematica Discreta](1/MDAL/MDAL.md)
 *   [Programmazione 1](1/PRG1/PRG1.md)
-*   [Algoritmica](1/ALG/ALG.md)
+*   [Algoritmica](1/ALG/)
 *   [Fisica](1/FIS/FIS.md)
 *   [Logica di Programmazione](1/LOG/LOG.md)
 
