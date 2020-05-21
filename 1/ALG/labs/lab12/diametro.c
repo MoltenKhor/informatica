@@ -128,10 +128,13 @@ Query * readQueries(int n, int m, Graph g){
 	Query * q = NULL;
 	q = malloc(n * sizeof(Query));
 	if(q != NULL){
-		for(int i=0; i<m; i++){
-			for(int j=0; j<m; j++){
-		 		q[i].start = i;
-				q[j].dest = j;
+		for(int k=0; k<n;){			
+			for(int i=0; i<m; i++){
+				for(int j=0; j<m; j++){
+		 			q[k].start = i;
+					q[k].dest = j;
+					k++;
+				}
 			}
 		}
 	}
@@ -148,7 +151,7 @@ int BFS(Graph g, Query query){
 	q.t = NULL;
 	q.n = 0;
 
-	if(query.start == query.dest){ return 0;}
+	if(query.start == query.dest){ return -2;}
 	//reset nodes for bfs
 	for(int i=0; i<g.n; i++){
 		g.a[i].c = W;
@@ -195,8 +198,7 @@ int main(){
 				dist = BFS(g, q[i]);
 				if(dist > maxDist){
 					maxDist = dist;
-				}		
-				
+					}		
 			}
 			printf("%d", maxDist);
 			free(q);
