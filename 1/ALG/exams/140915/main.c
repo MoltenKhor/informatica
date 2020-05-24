@@ -6,6 +6,8 @@ typedef struct _node{
 	int k;
 	int L;
 	int R;
+	int L_;
+	int R_;
 	struct _node * left;
 	struct _node * right;
 	struct _node * prev;
@@ -22,10 +24,8 @@ Node * insertNode(Node * node, int key){
 		return aux;
 	}
 	if(key < node->k){
-		node->L++;
 		node->left = insertNode(node->left, key);
 	}else{
-		node->R++;
 		node->right = insertNode(node->right, key);
 	}
 	return node;
@@ -44,13 +44,30 @@ Node * readABR(int * dim){
 	return t; 
 }
 
+void counter(Node * node){
+	if(node == NULL){ return; }
+	counter(node->left);
+	counter(node->right);
+	Node * aux = node;
+	while(aux->left != NULL){
+		node->L++;
+		aux = aux->left;
+	}
+	aux = node;
+	while(aux->right != NULL){
+		node->R++;
+		aux = aux->right;
+	}
+	return;
+}
+
 void printNodes(Node * t){
 	if(t == NULL){ return; }
-	printNodes(t->left);
-	printNodes(t->right);
-	if(t->L > t->R){
-		printf("%d\n", t->k);
-	}
+		printNodes(t->left);
+		if(t->L > t->R){
+			printf("%d\n", t->k);
+		}
+		printNodes(t->right);	
 	return;
 }
 
@@ -59,6 +76,7 @@ int main (){
 	int n;
 	tree = readABR(&n);
 	if(n != 0){
+		counter(tree);			
 		printNodes(tree);
 	}else{
 		printf("0\n");
