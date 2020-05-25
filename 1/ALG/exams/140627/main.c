@@ -74,6 +74,8 @@ HashTab readTab(){
 		scanf("%s", num);
 		insertHash(&t, name, num);
 	}
+
+	return t;
 }
 
 void printHashList(HashTab t, int k){
