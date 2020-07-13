@@ -2,203 +2,228 @@
 #include <stdlib.h>
 #include <limits.h>
 
-const char * colors[] = {"W", "G"};
+const char * colors[] = {"W","G"};
 typedef enum{
-	W = 0,
-	G = 1,
-}Color;
+    W = 0, //White
+    G = 1, //grey
+} Color;
 
-typedef struct _lnode{
-	int k;
-	struct _lnode * next;
-	struct _lnode * prev;
-}LNode;
+typedef struct _LNode{
+    int k;
+    struct _LNode * next;
+    struct _LNode * prev;
+} LNode;
 
-typedef struct _list{
-	LNode * h;
-	LNode * t;
-	int n; //number of iitems in list
-}List;
+typedef struct _List{
+    LNode * h; //Head pointer
+    LNode * t; //Tail pointer
+    int n; //Number of item in list
+} List;
 
-typedef struct _gnode{
-	List adj; //adjency list
-	Color c; //node color
-	int d; //time of discovery
-	int prev; //avo
-}GNode;
+typedef struct _GNode{
+    List adj; //Adjacency list
+    //BFS attributes
+    Color c; //Color
+    int d; //Discovery time
+    int prev; //Previous nodes discovered
+} GNode;
 
-typedef struct _graph{
-	GNode * a;	//nodes array
-	int n;	//number of nodes;
-}Graph;
+typedef struct _Graph{
+    GNode * a; //Array with graph nodes
+    int n;  //Nodes number
+} Graph;
 
-typedef struct _query{
+typedef struct _Query{
 	int start;
 	int dest;
-}Query;
-
-void tailInsert(List * q, int k){
-	LNode * aux = malloc(sizeof(LNode));
-	aux->k = k;
-	aux->next = NULL;
-	aux->prev = q->t;
-	if(q->t != NULL){ q->t->next = aux; }
-	if(q->h == NULL){ q->h = aux; }
-	q->t = aux;
-	q->n++;
-}
-
-int headRemove(List * q){
-	int u = -1;
-	if(q->h != NULL){
-		u = q->h->k;
-		LNode * aux = q->h->next;
-		if(q->h == q->t){	q->t = aux; }
-		free(q->h);
-		q->h = aux;
-		q->n--;
-	}
-	return u;
-}
+} Query;
 
 void deallocateList(List * l){
-	LNode * curr = l->h;
+	LNode * cur = l->h;
 	LNode * aux;
-
-	while(curr != NULL){
-		aux = curr;
-		curr = curr->next;
+	while(cur != NULL){
+		aux = cur;
+		cur = cur->next;
 		free(aux);
 	}
 	l->h = NULL;
 	l->t = NULL;
 }
 
+void readGNode(List * list){
+    List l;
+    int k;
+    //Initialization
+    l.h = NULL;
+    l.t = NULL;
+    //Read number of arches/nodes expected
+    scanf("%d",&l.n);// Number of departing arches to read
+    for(int i=0;i<l.n;i++){
+        LNode * aux;
+        scanf("%d",&k);
+        aux = (LNode *) malloc(sizeof(LNode));
+        aux->k = k;
+        aux->next = NULL;
+        aux->prev = l.t;
+        //Bottom insert in list
+        if(l.t == NULL){//Empty list
+            l.h = aux;
+            l.t = aux;
+        }else{//At least one element in list
+            l.t->next = aux;
+            l.t = aux;
+        }
+    }
+    *list = l;
+}
+
+int readGraph(Graph * graph){
+    Graph g;
+    
+    scanf("%d",&g.n); //Read number of nodes
+    g.a = (GNode *) malloc(g.n * sizeof(GNode));
+    //Read arches for each node
+    for(int i=0;i<g.n;i++){
+        readGNode(&(g.a[i].adj)); //Read adjacency list
+        g.a[i].c = W;
+        g.a[i].d = 0;
+        g.a[i].prev = -1;
+    }
+    
+    *graph = g;
+    return 1;
+}
+
+void printGraph(Graph g){
+    LNode * cur = NULL;
+    for (int i=0; i<g.n; i++) {
+        printf("%d [%s] d: %d prev: %d): ",i,colors[g.a[i].c],g.a[i].d,g.a[i].prev);
+        cur = g.a[i].adj.h; //Head of the adjacency list of node i
+        while(cur != NULL){
+            printf("%d -> ",cur->k);
+            cur = cur->next;
+        }
+        printf("\n");
+    }
+}
+
+void tailInsert(List * q,int k){
+    LNode * aux = malloc(sizeof(LNode));
+    aux->k = k;
+    aux->next = NULL;
+    aux->prev = q->t;
+    if(q->t != NULL)q->t->next = aux;
+    if(q->h == NULL) q->h = aux;
+    q->t = aux;
+    q->n++;
+}
+
+int headRemove(List * q){
+    int u = -1;
+    if(q->h != NULL){
+        u = q->h->k;
+        LNode * aux = q->h->next;
+        if(q->h == q->t) q->t = aux;
+        free(q->h);
+        q->h = aux;
+        q->n--;
+    }
+    return u;
+}
+
+int BFS(Graph g,Query query){
+    int dist = -2;
+    int u;
+    int s = query.start;
+    LNode * cur = NULL;
+    List q; //Queue (FIFO)
+    q.h = NULL;
+    q.t = NULL;
+    q.n = 0;
+    if(query.start == query.dest) return 0;
+    //Init nodes for BFS
+    for(int i=0;i<g.n;i++){
+        g.a[i].c = W;
+        g.a[i].d = INT_MAX;
+        g.a[i].prev = -1;
+    }
+    
+	 //Init source node
+    g.a[s].c = G;
+    g.a[s].prev = -1;
+    g.a[s].d = 0;
+    tailInsert(&q,s);
+    while(q.n != 0 && dist == -2){
+        u = headRemove(&q);
+        //printf("%d ",u);
+        cur = g.a[u].adj.h; //Head of the adjacency list of node u
+        while(cur != NULL && dist == -2){//Loop adj nodes of u node
+            if(g.a[cur->k].c == W){//White adj node
+                g.a[cur->k].c = G;
+                g.a[cur->k].d = g.a[u].d + 1;
+                g.a[cur->k].prev = u;
+                if(cur->k == query.dest) dist = g.a[cur->k].d;
+                else tailInsert(&q,cur->k);
+            }
+            cur = cur->next;
+        }
+    }
+    deallocateList(&q);
+    return dist;
+}
+
+void printList(List l){
+    LNode * c = l.h;
+    printf("List: ");
+    while(c != NULL){
+        printf("%d ",c->k);
+        c = c->next;
+    }
+}
+
 void deallocateGraph(Graph * g){
-	for(int i=0; i<g->n; i++){
-		deallocateList(&g->a[i].adj);
+	for(int i=0;i<g->n;i++){
+		deallocateList(&(g->a[i].adj));
 	}
 	free(g->a);
 	g->a = NULL;
 }
 
-void readGNode(List * list){
-	List l;
-	int k;
-	l.h = NULL;
-	l.t = NULL;
-
-	scanf("%d", &l.n);
-	for(int i=0; i<l.n; i++){
-		LNode * aux;
-		scanf("%d", &k);
-		aux = (LNode*)malloc(sizeof(LNode));
-		aux->k = k;
-		aux->next = NULL;
-		aux->prev = l.t;
-
-		if(l.t == NULL){
-			l.h = aux;
-			l.t = aux;
-		}else{
-			l.t->next = aux;
-			l.t = aux;
-		}
-	}
-	*list = l;
-}
-
-int readGraph(Graph * graph){
-	Graph g;
-	scanf("%d", &g.n);
-	g.a = (GNode*)malloc(g.n * sizeof(GNode));
-
-	for(int i=0; i<g.n; i++){
-		readGNode(&(g.a[i].adj));
-		g.a[i].c = W;
-		g.a[i].d = 0;
-		g.a[i].prev = -1;
-	}
-
-	*graph = g;
-	return 1;
-}
-
-Query * readQueries(int n, int m, Graph g){
+Query * readQueries(int n, int m){
 	Query * q = NULL;
 	q = malloc(n * sizeof(Query));
 	if(q != NULL){
-		for(int k=0; k<n;){			
-			for(int i=0; i<m; i++){
-				for(int j=0; j<m; j++){
-		 			q[k].start = i;
+		int k=0;				
+		for(int i=0;i<m;i++){
+			for(int j=0; j<m; j++){
+							
+					q[k].start = i;
 					q[k].dest = j;
 					k++;
-				}
+				
 			}
-		}
+		}	
 	}
 	return q;
-}
-
-int BFS(Graph g, Query query){
-	int dist = -1;
-	int u;
-	int s = query.start;
-	LNode * curr = NULL;
-	List q;
-	q.h = NULL;
-	q.t = NULL;
-	q.n = 0;
-
-	if(query.start == query.dest){ return -2;}
-	//reset nodes for bfs
-	for(int i=0; i<g.n; i++){
-		g.a[i].c = W;
-		g.a[i].d = INT_MAX;
-		g.a[i].prev = -1;
-	}
-
-	//init source node
-	g.a[s].c = G;
-	g.a[s].d = 0;
-	g.a[s].prev = -1;
-	tailInsert(&q, s);
-	while(q.n !=0 && dist ==-1){
-		u = headRemove(&q);
-		curr = g.a[u].adj.h;
-		while(curr != NULL && dist == -1){
-			if(g.a[curr->k].c == W){
-				g.a[curr->k].c = G;
-				g.a[curr->k].d = g.a[u].d+1;
-				g.a[curr->k].prev = 0;
-				if(curr->k == query.dest){	dist = g.a[curr->k].d;	}
-				else tailInsert(&q, curr->k);
-			}
-			curr = curr->next;
-		}
-	}
-	deallocateList(&q);
-	return dist;
 }
 
 int main(){
 	Graph g;
 	Query * q = NULL;
 	int nQueries;
-	int maxDist = -1;
-	int dist;
-	if(readGraph(&g)){
-		nQueries = g.n * g.n;
-		q = readQueries(nQueries, g.n, g);
-
-		if(q == NULL)printf("Error");
+	if( readGraph(&g) ){//Good graph read
+		nQueries = g.n * g.n;			
+		q = readQueries(nQueries, g.n);
+		//printGraph(g);
+		if(q == NULL) printf("An error occurred during memory allocation");
 		else{
-			for(int i=0; i<nQueries; i++){
-				dist = BFS(g, q[i]);
+			int maxDist = -2;
+			int dist;
+			for(int i=0;i<nQueries;i++){
+				dist = BFS(g,q[i]);
 				if(dist > maxDist){
 					maxDist = dist;
-					}		
+				}
 			}
 			printf("%d", maxDist);
 			free(q);

@@ -1,85 +1,90 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-
 typedef struct _node{
-	int k;
-	int L;
-	int R;
-	int L_;
-	int R_;
-	struct _node * left;
-	struct _node * right;
-	struct _node * prev;
+    int k;
+    struct _node * left;
+    struct _node * right;
+    int hasProp;
 }Node;
 
-Node * insertNode(Node * node, int key){
-	if(node == NULL){
-		Node * aux = (Node*)malloc(sizeof(Node));
-		aux->k = key;
-		aux->L = 0;
-		aux->R = 0;
-		aux->left = NULL;
-		aux->right = NULL;
-		return aux;
-	}
-	if(key < node->k){
-		node->left = insertNode(node->left, key);
-	}else{
-		node->right = insertNode(node->right, key);
-	}
-	return node;
+Node * insertABR(Node * t, int key){
+    if(t == NULL){
+        Node * aux = (Node*)malloc(sizeof(Node));
+        aux->k=key;
+        aux->left=NULL;
+        aux->right=NULL;
+        return aux;
+    }else{
+        if(key < t->k){
+            t->left = insertABR(t->left, key);
+        }else{
+            t->right = insertABR(t->right, key);
+        }
+    }
 }
 
 Node * readABR(int * dim){
-	int n;
-	int k;
-	Node * t = NULL;
-	scanf("%d", &n);
-	for(int i=0; i<n; i++){
-		scanf("%d", &k);
-		t = insertNode(t,k);
-	}
-	*dim = n;
-	return t; 
+    Node * t;
+    int n;
+    int k;
+    scanf("%d", &n);
+    for(int i=0; i<n; i++){
+        scanf("%d", &k);
+        t = insertABR(t, k);
+    }
+    *dim = n;
+    return t;
+}
+typedef struct _res{
+    int R;
+    int L;
+}Res;
+
+
+Res numLR(Node * t){
+    Res res;
+    res.L=0;
+    res.R=0;
+    if(t==NULL){
+        return res;
+    }
+    if(t->left != NULL){
+        Res rSx = numLR(t->left);
+        res.L += 1+rSx.L;
+    }
+    if(t->right != NULL){
+        Res rDx = numLR(t->right);
+        res.R += 1+rDx.R;
+    }
+
+    if(res.L > res.R) t->hasProp = 1;
+    return res;
 }
 
-void counter(Node * node){
-	if(node == NULL){ return; }
-	counter(node->left);
-	counter(node->right);
-	Node * aux = node;
-	while(aux->left != NULL){
-		node->L++;
-		aux = aux->left;
-	}
-	aux = node;
-	while(aux->right != NULL){
-		node->R++;
-		aux = aux->right;
-	}
-	return;
+void printABR(Node * t){
+    if(t==NULL) return;
+    printABR(t->left);
+    if(t->hasProp){
+        printf("%d\n",t->k);
+    }
+    printABR(t->right);
 }
 
-void printNodes(Node * t){
-	if(t == NULL){ return; }
-		printNodes(t->left);
-		if(t->L > t->R){
-			printf("%d\n", t->k);
-		}
-		printNodes(t->right);	
-	return;
+void freeABR(Node *t){
+    if(t==NULL) return;
+    if(t->left == NULL && t->right == NULL){
+        free(t); return;
+    }
+    freeABR(t->left);
+    freeABR(t->right);
 }
 
-int main (){
-	Node * tree;
-	int n;
-	tree = readABR(&n);
-	if(n != 0){
-		counter(tree);			
-		printNodes(tree);
-	}else{
-		printf("0\n");
-	}
-	return 0;
+int ian(){
+    Node * tree;
+    int n;
+    tree = readABR(&n);
+    numLR(tree);
+    printABR(tree);
+    freeABR(tree);
+    return 0;
 }

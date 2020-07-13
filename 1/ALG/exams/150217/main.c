@@ -2,93 +2,93 @@
 #include <stdlib.h>
 #include <limits.h>
 
-typedef struct _tnode{
-	int key;
-	struct _tnode * left;
-	struct _tnode * right;
-	struct _tnode * prev;
-
-}TNode;
+typedef struct _node{
+    int k;
+    struct _node * left;
+    struct _node * right;
+    struct _node * prev;
+}Node;
 
 typedef struct _res{
-	int maxSum;
-	int min;
+    int maxSum;
+    int min;
 }Res;
 
-Res getMaxSum(TNode * u){
-	if(u == NULL){
-		Res r;
-		r.maxSum = 0;
-		r.min = INT_MAX;
-		return r;
-	}else{
-		Res res;
-		res.maxSum = u->key;
-		res.min = u->key;
-		Res sx = getMaxSum(u->left);
-		Res dx = getMaxSum(u->right);
+Res getMaxSum(Node * u){
+    if(u==NULL){
+        Res r;
+        r.maxSum = 0;
+        r.min = INT_MAX;
+        return r;
+    }else{
+        Res res;
+        res.maxSum = u->k;
+        res.min = u->k;
 
-		if(sx.maxSum == dx.maxSum){
-			res.maxSum += sx.maxSum;
-			if(sx.min < res.min){
-				res.min = sx.min;
-			}
-		}else{
-			if(sx.maxSum < dx.maxSum){
-				res.maxSum += dx.maxSum;
-				if(dx.min < res.min){
-					res.min = dx.min;
-				}
-			}else{
-				res.maxSum += sx.maxSum;
-				if(sx.min <res.min){
-					res.min = sx.min;
-				}
-			}
-		}
-		return res;
-	}
+        Res rDx = getMaxSum(u->right);
+        Res rSx = getMaxSum(u->left);
+
+        if(rSx.maxSum == rDx.maxSum){
+            res.maxSum += rSx.maxSum;
+            if(rSx.min < res.min){
+                res.min = rSx.min;
+            }
+        }else{
+            if(rSx.maxSum < rDx.maxSum){
+                res.maxSum += rDx.maxSum;
+                if(rDx.min < res.min){
+                    res.min = rDx.min;
+                }
+            }else{
+                res.maxSum += rSx.maxSum;
+                if(rSx.min < res.min){
+                    res.min = rSx.min;
+                }
+            }
+        }
+        return res;
+    }
 }
 
-TNode * insertABR(TNode * node, int key){
-	if(node == NULL){
-		TNode * aux = (TNode *) malloc(sizeof(TNode));
-		aux->key = key;
-		aux->right = NULL;
-		aux->left = NULL;
-		return aux;
-	}
-	if(key < node->key){
-		node->left = insertABR(node->left, key);
-	}else{
-		node->right = insertABR(node->right, key);
-	}
-
-	return node;
+Node * insertABR(Node * t, int k){
+    if(t == NULL){
+        Node * aux = (Node*)malloc(sizeof(Node));
+        aux->k = k;
+        aux->right = NULL;
+        aux->left = NULL;
+        aux->prev = NULL;
+        return aux;
+    }else{
+        if(k< t->k){
+            t->left = insertABR(t->left, k);
+        }else{
+            t->right = insertABR(t->right, k);
+        }
+    }
+    return t;
 }
 
-TNode * readTree(int * dim){
-		TNode * t = NULL;
-		int n;
-		int k;
-		scanf("%d", &n);
-		for(int i=0; i<n; i++){
-			scanf("%d", &k);
-			t = insertABR(t,k);
-		}
-		*dim = n;
-		return t;
+Node * readTree(int * dim){
+    Node * aux = NULL;
+    int n; 
+    int k;
+    scanf("%d", &n);
+    for(int i=0; i<n; i++){
+        scanf("%d", &k);
+        aux = insertABR(aux, k);
+    }
+    *dim = n;
+    return aux;
 }
 
 int main(){
-	TNode * tree;
-	int n;
-	tree = readTree(&n);
-	if(n==0){
-		printf("0\n");
-	}else{
-		Res r = getMaxSum(tree);
-		printf("%d\n", r.min);
-	}
-	return 0;
+    int N;
+    Node * tree;
+    tree = readTree(&N);
+    if(N==0) printf("--0--\n");
+    else{
+        Res r = getMaxSum(tree);
+        printf("%d\n", r.min); 
+    }
+    return 0;
 }
