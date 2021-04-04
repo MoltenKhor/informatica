@@ -15,7 +15,7 @@
 
 ## 2° Anno
 
-*   [#TODO Programmazione 2](2/PRG2/PRG2.md)
+*   [#TODO Programmazione 2](2/PR2/PR2.md)
 *   [Laboratorio di Sistemi Operativi](2/SOL/SOL.md)
 *   [#TODO Ricerca Operativa](2/RO/RO.md)
 *   [#TODO Basi di Dati](2/BDD/BDD.md)
