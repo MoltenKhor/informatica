@@ -4,8 +4,8 @@
 #include <string.h>
 #include <getopt.h>
 
-#define NOPTIONS       4
-#define MY_ARGV_MAX  512
+#define NOPTIONS       4                                    //numero massimo di opzioni consentite
+#define MY_ARGV_MAX  512                                    //numero massimo di caratteri consentiti per il comando -o
 
 
 int isNumber(const char* s, long* n) {
@@ -22,6 +22,7 @@ int isNumber(const char* s, long* n) {
   return 1;   // non e' un numero
 }
 
+//ogni funzione effettua la stampa della sua tipologia separatamente
 int argh(const char* programname){
     printf("usage: %s -n <num> -m <num> -o <string> -h\n", programname);
     return -1;
@@ -66,21 +67,21 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    int opt;
+    int opt;                                                               //inizializzo una variabile per la memorizzazione dell'opzione
 
-    while((opt = getopt(argc, argv, ":n:m:o:h")) != -1){
-        switch(opt){
+    while((opt = getopt(argc, argv, ":n:m:o:h")) != -1){                   //La funzione getopt ritorna o i valori riconosciuti nella stringa ":n:m:o:h" divisi da : oppure ? se nessun comando è stato riconosciuto
+        switch(opt){                                                       //utilizziamo opt per lo switch per selezionare quale funzione chiamare 
             case 'n': argn(optarg); break;
             case 'm': argm(optarg); break;
-            case 'o': argo(optarg); break;
+            case 'o': argo(optarg); break;                              
             case 'h': argh(argv[0]); break;
             case ':': {
-                printf("L'opzione '-%c' richiede un argomento", optopt);
+                printf("L'opzione '-%c' richiede un argomento", optopt);    //in questo caso getopt ha rilevato il carattere - ma seguito da nessun carattere
             }break;
             case '?': {
-                printf("L'opzione '-%c' non è gestita", optopt);
+                printf("L'opzione '-%c' non è gestita", optopt);            //in questo caso getopt ha rilevato un carattere non presente nella stringa degli ammessi
             }break;
-            default:;
+            default:;                                                       //il default non effettua nessuna operazione, perché appunto, nessun comando da eseguire
         }
     }
     return 0;
