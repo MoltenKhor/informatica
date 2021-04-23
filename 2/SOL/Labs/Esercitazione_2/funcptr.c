@@ -20,7 +20,7 @@ int isNumber(const char* s, long* n) {
   }
   return 1;   // non e' un numero
 }
-
+//varie fuznioni che gestiscono singolarmente il tipo di option degli argomenti
 int argh(const char* programname, void** a) {
     printf("usage: %s -n <num> -m <num> -o <string> -h\n", programname);
     return -1;
@@ -53,9 +53,9 @@ int argo(const char* o, void** a) {
   return 0;
 }
 
-typedef int (*F_t)(const char*, void** arg);
+typedef int (*F_t)(const char*, void** arg);                  //effettuo un typedef del puntatore a funzione
 
-typedef struct V_entry {
+typedef struct V_entry {                                      //struttura dati che memorizza sia il puntatore a funzione sia l'argomento
   F_t   F;   // puntatore a funzione
   void* a;   // valore dell'argomento gestito dalla funzione
 } V_entry;
@@ -67,26 +67,26 @@ int main(int argc, char* argv[]){
     return -1;
   }
 
-    V_entry V[NOPTIONS] = {
+    V_entry V[NOPTIONS] = {                                   //inizializzo a null il vettore contenente la struttura dati con puntatore a funzione e argomento, tutti settati a NULL
         {NULL, NULL},
         {NULL, NULL},
         {NULL, NULL},
         {NULL, NULL}
     };
 
-    V[0].F = argh;
-    V[1].F = argn;
+    V[0].F = argh;                                             //per ogni elemento del vettore V vado ad associare alla variabile puntatore di funzione l'indirizzo statico delle funzioni
+    V[1].F = argn;                                             //che gestiscono i singoli argomenti option
     V[2].F = argm;
     V[3].F = argo;
 
     int opt;
 
     int r = EXIT_SUCCESS;
-
+    //utilizzo, come in precedenza, la libreria getopt e nello switch uso solo i casi non riconosciuti, altrimenti default chiamo la funzione presente nel vettore dei puntatori di funzioni
     while((opt = getopt(argc, argv, ":n:m:o:h"))!= -1){
         switch(opt){
             case ':':{
-                printf("l'opzione '-%c' richiede un argomento\n", opt);
+                printf("l'opzione '-%c' richiede un argomento\n", opt);           
                 r = EXIT_FAILURE;
             }break;
             case '?':{
@@ -99,11 +99,11 @@ int main(int argc, char* argv[]){
     }
 
     if (V[1].a)  printf("m = %ld\n",     *(long*)(V[1].a));
-    if (V[2].a)  printf("n = %ld\n",     *(long*)(V[2].a));
+    if (V[2].a)  printf("n = %ld\n",     *(long*)(V[2].a)); //se la variabile a non è null stampo il suo valore, essendo di tipo void devo prima castarla a long o char* a seconda della funzione 
     if (V[3].a)  printf("o = \"%s\"\n",   (char*)(V[3].a));
 
     free(V[1].a);
     free(V[2].a);
-    free(V[3].a);
+    free(V[3].a);       //libero la memoria dai malloc
 
 }

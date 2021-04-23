@@ -25,11 +25,11 @@ int isNumber(const char* s, long* n) {
 }
 
 int main(int argc, char* argv[]){
-
+    //copio i valori di default nel caso l'utente non li abbia specificati
     long k1 = K1;
     long k2 = K2;
     long n = N;
-
+    //controllo che l'input sia corretto
     if(argc>1){
         if(argc!=4){
             printf("Usa %s K1 K2 N\n", argv[0]);
@@ -53,23 +53,23 @@ int main(int argc, char* argv[]){
         }
     }
 
-    unsigned int seed = time(NULL);
-    const long k = k2-k1;
+    unsigned int seed = time(NULL);             //inizializzo il seed usando come valore il tempo
+    const long k = k2-k1;                       //conto la dimensione dei possibili vaolri nel range
 
-    long c[k];
+    long c[k];                                  //istanzio un vettore di dimensione dei possibili valori
 
     for(int i=0; i<k; i++){
-        c[i]=0;
+        c[i]=0;                                 //resetto il contenuto del vettore
     }
 
-    for(int i=0; i<n; i++){
+    for(int i=0; i<n; i++){                     //per n iterazioni genero un numero random con il seed generato precedentemente
         long r = k1+rand_r(&seed)%k;
-        c[r%k]++;
+        c[r%k]++;                               //incremento ogni volta il valore tra quelli possibili
     }
 
     printf("Occorrenze:\n");
     for(int i=0; i<k; i++){
-        printf("%ld : %5.2f%% \n", i+k1, (c[i]/(float)n)*100);
+        printf("%ld : %5.2f%% \n", i+k1, (c[i]/(float)n)*100);  //stampo il numero di ogni occorrenza formattando correttamente la percentuale 
     }
     printf("\n");
     return 0;
