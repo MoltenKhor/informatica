@@ -1,0 +1,3 @@
+logfile:socket.sk:10:100:4
+
+#format => <logFileName>:<socketFileName>:Memory(in MBytes):FileStorageSize:numberOfWorkers
