@@ -102,6 +102,17 @@ static inline int isNumber(const char* s, long* n) {
   return 1;   // non e' un numero
 }
 
+#define LOCK_RETURN(l, r) if(pthread_mutex_lock(l)!=0){ \
+  fprintf(stderr, "ERRORE FATALE lock_return\n"); \
+  return r;  \
+}
+
+#define UNLOCK_RETURN(l, r) if(pthread_mutex_unlock(l)!=0){ \
+  fprintf(stderr, "ERRORE FATALE unlock_return\n"); \
+  return r;  \
+}
+
+
 #define LOCK(l)      if (pthread_mutex_lock(l)!=0)        { \
     fprintf(stderr, "ERRORE FATALE lock\n");		    \
     pthread_exit((void*)EXIT_FAILURE);			    \

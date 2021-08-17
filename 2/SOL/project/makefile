@@ -1,13 +1,14 @@
 CC			= gcc
-AR			= AR
+AR			= ar
+ARFLAGS		= rvs
 CFLAGS		+= -std=c99 -Wall -Werror -g
-INCDIR		= 
-INCLUDES	= #-I. -I $(INCDIR)
-LDFLAGS		= #-L.
+INCDIR		= ./utils/includes -I ./threadpool
+INCLUDES	= -I. -I $(INCDIR)
+LDFLAGS		= -L.
 OPTFLAGS	= #-03
 LIBS		= -lpthread
 
-TARGETS		= server client
+TARGETS		= client server
 
 .PHONY: all clean cleanall test1 test2 test3
 .SUFFIXES: .c .h
@@ -17,13 +18,30 @@ TARGETS		= server client
 
 all	: $(TARGETS)
 
-server.o:	server.c
+server: server.o threadF.o memory.o libPool.a
+	$(CC) $(CFLAGS) $(INCLUDES) $(OPTFLAGS) -o $@ $^ $(LDFLAGS) $(LIBS)
 
-client.o:	client.c api.c
+libPool.a: ./threadpool/threadpool.o ./threadpool/threadpool.h
+	$(AR) $(ARFLAGS) $@ $<
+
+server.o:	server.c 
+
+client:		client.o api.o
+
+client.o:	client.c
+
+threadF.o:	threadF.c 
+
+./threadpool/threadpool.o: ./threadpool/threadpool.c
+
+api.o: api.c
 
 api.c:	api.h
+
+memory.o: memory.c
+
 
 clean		: 
 	rm -f $(TARGETS)
 cleanall	: clean
-	\rm -f *.o *~
+	\rm -f *.o *~ *.a ./threadpool/*.o threadpool/*~
