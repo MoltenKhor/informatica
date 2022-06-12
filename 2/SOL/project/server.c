@@ -166,6 +166,7 @@ int main(int argc, char* argv[]){
         perror("socket");
         goto _exit;
     }
+   
 
     struct sockaddr_un serv_addr;
     memset(&serv_addr, '0', sizeof(serv_addr));

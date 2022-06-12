@@ -17,10 +17,21 @@ int nCommands = 0;
 long requestDelay = 0;
 char *missDirectory = NULL;
 char *saveDirectory = NULL;
+int notused;
 
 
 void clean(){
     free(socketfile);
+}
+
+void append_command( char *arg, char* command){
+  
+    openConnection(socketfile, 1000);
+
+    writeFile(arg, NULL);
+    closeConnection(socketfile);
+    
+    return;
 }
 
 /*command execution function, some called directly some from append list*/
@@ -119,6 +130,7 @@ int comm_D(const char *arg){
 }
 
 int comm_w(const char *arg){
+
     return 1;
 }
 
@@ -152,13 +164,7 @@ int comm_c(const char *arg){
 
 
 
-void append_command( char *arg, char* command){
-   // struct timespec timer;
-    openConnection(socketfile, 1000);
 
-    closeConnection(socketfile);
-    return;
-}
 
 
 int main(int argc, char* argv[]){
@@ -168,7 +174,7 @@ int main(int argc, char* argv[]){
         comm_help(argv[0]); 
         return -1;
     }
-    socketfile = "./sk_sock";
+    socketfile = "sk_sock";
     int opt;
 
     while((opt = getopt(argc, argv, ":f:w:W:d:r:R:D:t:l:u:c:p h")) != -1){
@@ -181,7 +187,7 @@ int main(int argc, char* argv[]){
             case 'D': comm_D(optarg); break;        
             case 'd': comm_d(optarg); break;        //todo
             //read-write commands to be append
-            case 'w': append_command(optarg, "w"); break;       //todo
+            case 'w': append_command(optarg, "w"); break;       
             case 'W': append_command(optarg, "W"); break;       //todo
             case 'r': append_command(optarg, "r"); break;       //todo
             case 'R': append_command(optarg, "R"); break;       //todo
