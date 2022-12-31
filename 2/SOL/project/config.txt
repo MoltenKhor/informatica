@@ -1,3 +1,0 @@
-logfile:./sk_sock:100:100:4
-
-#format => <logFileName>:<socketFileName>:Memory(in KBytes):FileStorageSize:numberOfWorkers
